@@ -89,22 +89,12 @@ export class News extends Component {
       <div className='container my-3 space-y-3'>
         <h1 className='text-center m-4'>JSNews - Top Headlines</h1>
         {this.state.loading && <Spinner />}
-        <div className="row row-eq-height ">
-          {!this.state.loading && this.state.articles.map((element) => (
-            <div className="col-md-4 col-sm-6 col-xs-12 mb-4" key={element.url}>
-              <div className="card h-100">
-                {/* Set a fixed height for each card */}
-                <img src={element.urlToImage ? element.urlToImage : "https://images.wsj.net/im-841784/social"} className="card-img-top" alt={element.title} style={{ height: '200px' }} />
-                <div className="card-body">
-                  <h5 className="card-title">{element.title ? element.title.slice(0, 40) : ""}</h5>
-                  <p className="card-text">{element.description ? element.description.slice(0, 80) : ""}</p>
-                </div>
-                <div className="card-footer">
-                  <a href={element.url} className="btn btn-secondary">Read More</a>
-                </div>
-              </div>
+        <div className="row row-eq-height">
+          {!this.state.loading && this.state.articles.map((element) => {
+            return <div className="col-md-4 col-sm-6 col-xs-12 mb-4" key={element.url}>
+              <NewsItem title={element.title?element.title:""} description={element.description?element.description:""} imgUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} source={element.source.name}/>
             </div>
-          ))}
+          })}
         </div>
 
         <div className='container d-flex justify-content-between'>

@@ -18,70 +18,58 @@ export class News extends Component {
   }
   constructor() {
     super();
-    console.log("Hello I am a constructor from News Component");
     this.state = {
       articles: [],
       loading: false,
       page: 1
     }
   }
-  // ek async function apni body k andar wait kr saktaa he kuch promisses ke resolve hone ka
   async componentDidMount() {
-    console.log("cdm");
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=a6be903c18604fb29611931379e92eeb&page=1&pageSize=${this.props.pageSize}`;
-    this.setState({loading: true})
-    //to ye func intezaar krega "let data = await fetch(url);" is promise k poora hone ka
-    let data = await fetch(url);
-    let parsedData = await data.json()
-    console.log(parsedData);
-    this.setState({ articles: parsedData.articles, 
-      totalArticles: parsedData.totalResults,
-      loading: false
-     })
+    // Fetch data based on the current page
+    this.updateNews(this.state.page);
   }
-
-  handlePreClick = async () => {
-    console.log("Previous clicked!");
-    let newPage = this.state.page - 1;
-
-    // Ensure we don't go below page 1
-    if (newPage <= 0) {
-      return;
-    }
-
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=a6be903c18604fb29611931379e92eeb&page=${newPage}&pageSize=${this.props.pageSize}`;
-    this.setState({loading: true})
-    let data = await fetch(url);
-    let parsedData = await data.json();
-
-    // Check if the response contains articles
-    if (parsedData.articles && parsedData.articles.length > 0) {
+  
+  async updateNews(page) {
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=a6be903c18604fb29611931379e92eeb&page=${page}&pageSize=${this.props.pageSize}`;
+    this.setState({ loading: true });
+  
+    try {
+      let data = await fetch(url);
+      if (!data.ok) {
+        throw new Error(`Network response was not ok (${data.status} ${data.statusText})`);
+      }
+      let parsedData = await data.json();
       console.log(parsedData);
       this.setState({
-        page: newPage,
         articles: parsedData.articles,
+        totalArticles: parsedData.totalResults,
         loading: false
       });
-    } else {
-      alert("No articles found for this page.");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      this.setState({ loading: false });
     }
   }
-
-  handleNextClick = async () => {
+  
+  handlePreClick = () => {
+    console.log("Previous clicked!");
+    let newPage = this.state.page - 1;
+  
+    // Ensure we don't go below page 1
+    if (newPage >= 1) {
+      this.setState({ page: newPage }, () => {
+        this.updateNews(newPage);
+      });
+    }
+  }
+  
+  handleNextClick = () => {
     console.log("Next clicked!");
-    if (!(this.state.page + 1 > Math.ceil(this.state.totalArticles / this.props.pageSize))) {
-     
-      let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=a6be903c18604fb29611931379e92eeb&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
-      this.setState({loading: true})
-      //to ye func intezaar krega "let data = await fetch(url);" is promise k poora hone ka
-      let data = await fetch(url);
-      let parsedData = await data.json()
-      console.log(parsedData);
-      this.setState({
-        page: this.state.page + 1,
-        articles: parsedData.articles,
-        loading: false
-      })
+    if (this.state.page + 1 <= Math.ceil(this.state.totalArticles / this.props.pageSize)) {
+      let newPage = this.state.page + 1;
+      this.setState({ page: newPage }, () => {
+        this.updateNews(newPage);
+      });
     }
   }
   render() {

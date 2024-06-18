@@ -21,7 +21,7 @@ export class NewsItem extends Component {
         <div className="card h-100">
           <span className='position-absolute top-0 translate-middle badge rounded-pill bg-danger' style={{ left: '90%', zIndex: 1 }}>{source}</span>
           {/* Set a fixed height for each card */}
-          <img src={!imgUrl ? "https://images.wsj.net/im-841784/social" : imgUrl} className="card-img-top" style={{ height: '200px' }} />
+          <img src={!imgUrl ? "https://images.wsj.net/im-841784/social" : imgUrl} className="card-img-top" alt="News Thumbnail" style={{ height: '200px' }} />
           <div className="card-body">
             <h5 className="card-title">{title}</h5>
             <p className="card-text">{description}</p>
